@@ -2,7 +2,7 @@ import { prodDomain } from './spec-config';
 import { resolveApp } from './utils';
 
 export enum PROJECT_ENV_ENUM {
-  development = 'development',
+  dev = 'dev',
   prod = 'prod',
   beta = 'beta',
 }
@@ -22,34 +22,23 @@ export enum QINIU_UPLOAD_PROGRESS_TYPE {
   chunkFileProgress = 2,
 }
 
-export const QINIU_BACKUP = {
-  domain: `backup.${prodDomain}`,
-  url: `http://backup.${prodDomain}/`,
-  bucket: 'hss-backup',
-  prefix: {
-    'billd-desk/mysql/': 'billd-desk/mysql/',
-  },
-};
-
-export const QINIU_RESOURCE = {
-  domain: `resource.${prodDomain}`,
-  url: `https://resource.${prodDomain}`,
-  bucket: 'hssblog',
-  prefix: {
-    'billd-desk/image/': 'billd-desk/image/',
-    'billd-desk/msg-image/': 'billd-desk/msg-image/',
-    'billd-desk/live-preview/': 'billd-desk/live-preview/',
-  },
-};
-
 export const CORS_ALLOW_ORIGIN: string | string[] = [
+  `http://www.${prodDomain}`,
   `https://www.${prodDomain}`,
+  `http://admin.${prodDomain}`,
   `https://admin.${prodDomain}`,
+  `http://live.${prodDomain}`,
   `https://live.${prodDomain}`,
+  `http://live-admin.${prodDomain}`,
   `https://live-admin.${prodDomain}`,
+  `http://nuxt2.${prodDomain}`,
   `https://nuxt2.${prodDomain}`,
+  `http://next.${prodDomain}`,
   `https://next.${prodDomain}`,
+  `http://project.${prodDomain}`,
   `https://project.${prodDomain}`,
+  `http://desk.${prodDomain}`,
+  `https://desk.${prodDomain}`,
 ];
 
 /** 消息最大长度 */
@@ -76,17 +65,27 @@ export const UPLOAD_DIR =
     ? resolveApp('/dist/upload/')
     : resolveApp('/upload/'); // 上传文件接口接收到的文件存放的目录
 
-export const SECRET_FILE =
+export const SECRET_DEV_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? resolveApp('/dist/secret/secret.js')
-    : resolveApp('/src/secret/secret.ts'); // 秘钥文件
+    ? resolveApp('/dist/secret/secret-dev.js')
+    : resolveApp('/src/secret/secret-dev.ts'); // 秘钥文件
 
-export const SECRETTEMP_FILE =
+export const SECRET_BETA_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
-    ? resolveApp('/dist/secret/secretTemp.js')
-    : resolveApp('/src/secret/secretTemp.ts'); // 秘钥文件模板
+    ? resolveApp('/dist/secret/secret-beta.js')
+    : resolveApp('/src/secret/secret-beta.ts'); // 秘钥文件
 
-export const maxBitrate = 1000 * 3; // 最大码率，3m
+export const SECRET_PROD_FILE =
+  PROJECT_ENV === PROJECT_ENV_ENUM.prod
+    ? resolveApp('/dist/secret/secret-prod.js')
+    : resolveApp('/src/secret/secret-prod.ts'); // 秘钥文件
+
+export const SECRET_TEMPLATE_FILE =
+  PROJECT_ENV === PROJECT_ENV_ENUM.prod
+    ? resolveApp('/dist/secret/secret-template.js')
+    : resolveApp('/src/secret/secret-template.ts'); // 秘钥文件模板
+
+export const MAX_BITRATE = 1000 * 3; // 最大码率，3m
 
 export const SERVER_VIDEO_DIR = '/node/video/'; // 服务器video目录
 export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
@@ -94,8 +93,8 @@ export const DOMAIN_URL = 'localhost'; // 本地地址，一般是localhost或�
 
 export const COMMON_ERROR_CODE = {
   serverError: 10000, // 服务器错误
-  banIp: 1000, // 黑名单禁用了ip
-  userStatusIsDisable: 1001, // 你的账号已被禁用，请联系管理员处理！
+  frequent: 1000, // 当前ip请求频繁，已被禁用！
+  admin_disable: 1001, // 你的账号已被禁用，请联系管理员处理！
   notFound: 1002, // 返回了404的http状态码
   errStatusCode: 1003, // 返回了即不是200也不是404的http状态码
   shutdown: 1004, // 停机维护
@@ -120,10 +119,10 @@ export const COMMON_HTTP_CODE = {
 };
 
 export const COMMON_ERROE_MSG = {
-  banIp: '此ip已被禁用，请联系管理员处理！', // 此ip已被禁用，请联系管理员处理！
+  frequent: '当前ip请求频繁，已被禁用！', // 当前ip请求频繁，已被禁用！
   jwtExpired: '登录信息过期！', // 登录信息过期！
   invalidToken: '非法token！', // 非法token！
-  userStatusIsDisable: '你的账号已被禁用，请联系管理员处理！', // 你的账号已被禁用，请联系管理员处理！
+  admin_disable: '你的账号已被禁用，请联系管理员处理！', // 你的账号已被禁用，请联系管理员处理！
   userStatusNoNormal: '用户状态非正常', // 你的账号已被管理员禁用，请联系管理员处理！
   shutdown: '停机维护中', // 停机维护中
 
@@ -149,11 +148,6 @@ export const COMMON_SUCCESS_MSG = {
   loginSuccess: '登录成功！',
 };
 
-export const BLACKLIST_TYPE = {
-  banIp: 1, // 频繁操作
-  adminDisableUser: 2, // 被管理员禁用
-};
-
 export const SCHEDULE_TYPE = {
   verifyStream: 'handleVerifyStream',
   blobIsExist: 'blobIsExist',
@@ -162,26 +156,35 @@ export const SCHEDULE_TYPE = {
 
 export const REDIS_PREFIX_ENV = `${PROJECT_NAME}-${PROJECT_ENV}-`;
 
-// redis前缀
-export const REDIS_PREFIX = {
+// redis key前缀
+export const REDIS_KEY = {
   emailLogin: `${REDIS_PREFIX_ENV}emailLogin___`, // 邮箱登录
   emailRegister: `${REDIS_PREFIX_ENV}emailRegister___`, // 邮箱注册
   userBindEmail: `${REDIS_PREFIX_ENV}userBindEmail___`, // 用户绑定邮箱
   userCancelBindEmail: `${REDIS_PREFIX_ENV}userCancelBindEmail___`, // 用户取消绑定邮箱
   joined: `${REDIS_PREFIX_ENV}joined___`, // 用户加入了房间
-  roomIsLiveing: `${REDIS_PREFIX_ENV}roomIsLiveing___`, // 主播正在直播
   order: `${REDIS_PREFIX_ENV}order___`, // 订单
   fileProgress: `${REDIS_PREFIX_ENV}fileProgress___`, // 文件上传进度
   qrCodeLogin: `${REDIS_PREFIX_ENV}qrCodeLogin___`, // 二维码登录
-  disableSpeaking: `${REDIS_PREFIX_ENV}disableSpeaking___`, // 禁言用户
-  kick: `${REDIS_PREFIX_ENV}kick___`, // 踢掉用户
-  liveRoomOnlineUser: `${REDIS_PREFIX_ENV}liveRoomOnlineUser___`, // 直播间在线用户
-  socketIdJoinLiveRoom: `${REDIS_PREFIX_ENV}socketIdJoinLiveRoom___`,
   livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
   dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
   dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
   deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
   deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
+  tencentcloudCssPublishing: `${REDIS_PREFIX_ENV}tencentcloudCssPublishing___`,
+  srsPublishing: `${REDIS_PREFIX_ENV}srsPublishing___`,
+  rtcLiving: `${REDIS_PREFIX_ENV}rtcLiving___`,
+  keepJoined: `${REDIS_PREFIX_ENV}keepJoined___`, // 用户加入了房间
+};
+
+// redis 频道
+export const REDIS_CHANNEL = {
+  writeDbLog: `${REDIS_PREFIX_ENV}writeDbLog___`,
+};
+
+// rabbitmq 频道
+export const RABBITMQ_CHANNEL = {
+  order: `${REDIS_PREFIX_ENV}order___`,
 };
 
 export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器
@@ -307,11 +310,31 @@ export const DEFAULT_ROLE_INFO = {
   },
 };
 
-export const SRS_CB_URL_PARAMS = {
+export const SRS_CB_URL_QUERY = {
   publishKey: 'pushkey',
   publishType: 'pushtype',
   userToken: 'usertoken',
   userId: 'userid',
   randomId: 'randomid',
   roomId: 'roomid',
+  isdev: 'isdev',
 };
+
+export const LIVE_ROOM_MODEL_EXCLUDE = [
+  'push_rtmp_url',
+  'push_obs_server',
+  'push_obs_stream_key',
+  'push_webrtc_url',
+  'push_srt_url',
+  'push_cdn_rtmp_url',
+  'push_cdn_obs_server',
+  'push_cdn_obs_stream_key',
+  'push_cdn_webrtc_url',
+  'push_cdn_srt_url',
+  'forward_bilibili_url',
+  'forward_huya_url',
+  'forward_douyu_url',
+  'forward_douyin_url',
+  'forward_kuaishou_url',
+  'forward_xiaohongshu_url',
+];

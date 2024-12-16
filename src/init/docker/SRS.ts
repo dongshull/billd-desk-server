@@ -9,7 +9,7 @@ export const dockerRunSRS = (init = true) => {
 
   // let isRunning = false;
 
-  // if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+  // if (PROJECT_ENV === PROJECT_ENV_ENUM.dev) {
   //   try {
   //     execSync(`docker ps -a | grep ${SRS_CONFIG.docker.container}`);
   //     isRunning = true;
@@ -26,9 +26,8 @@ export const dockerRunSRS = (init = true) => {
   try {
     // 停掉旧的容器
     execSync(`docker stop ${SRS_CONFIG.docker.container}`);
-  } catch (error) {
+  } catch {
     console.log('停掉旧的srs容器出错');
-    // console.log(error);
   }
 
   try {

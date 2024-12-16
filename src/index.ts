@@ -5,8 +5,10 @@ import './init/initFile';
 import { performance } from 'perf_hooks';
 
 import { connectMysql } from '@/config/mysql';
+import { connectRabbitMQ } from '@/config/rabbitmq';
 import { connectRedis } from '@/config/redis';
-import { createRedisPubSub } from '@/config/redis/pub';
+import { connectRedisPub } from '@/config/redis/publish';
+import { connectRedisSub } from '@/config/redis/subscribe';
 import {
   PROJECT_ENV,
   PROJECT_INIT_MYSQL,
@@ -22,7 +24,11 @@ import {
   chalkWARN,
 } from '@/utils/chalkTip';
 
+import { connectRabbitMQConsumer } from './config/rabbitmq/consumer';
+import { connectRabbitMQProducer } from './config/rabbitmq/producer';
+
 const start = performance.now();
+
 async function main() {
   function adLog() {
     console.log();
@@ -34,7 +40,7 @@ async function main() {
     );
     console.log(
       chalkINFO(
-        `欢迎PR:      billd-desk目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
+        `欢迎PR:      billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
       )
     );
     console.log();
@@ -44,16 +50,21 @@ async function main() {
     await (
       await import('./controller/init.controller')
     ).default.common.initDefault();
+    console.log(chalkSUCCESS(`初始化数据库数据完成！请退出该命令！`));
     return;
   }
   try {
     await Promise.all([
       connectMysql(), // 连接mysql
       connectRedis(), // 连接redis
-      createRedisPubSub(), // 创建redis的发布订阅
+      connectRedisPub(), // 连接redis的发布
+      connectRedisSub(), // 连接redis的订阅
+      connectRabbitMQ(), // 连接rabbitmq
+      connectRabbitMQProducer(), // 连接rabbitmq的生产者
+      connectRabbitMQConsumer(), // 连接rabbitmq的消费者
     ]);
   } catch (error) {
-    console.log(chalkERROR('mysql或redis初始化失败！'));
+    console.log(chalkERROR('rabbitmq、mysql、redis初始化失败！'));
     console.log(error);
     // 触发pm2的重启进程
     process.exit(1);

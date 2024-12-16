@@ -4,7 +4,6 @@ import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
 import {
-  BLACKLIST_TYPE,
   COMMON_ERROE_MSG,
   COMMON_ERROR_CODE,
   COMMON_HTTP_CODE,
@@ -13,6 +12,7 @@ import {
 } from '@/constant';
 import authController from '@/controller/auth.controller';
 import blacklistController from '@/controller/blacklist.controller';
+import { BlacklistTypeEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import { strSlice } from '@/utils';
 import { chalkINFO } from '@/utils/chalkTip';
@@ -55,6 +55,8 @@ const frontendWhiteList = [
   '/srs/on_stop',
   '/srs/on_unpublish',
   '/srs/on_dvr',
+  '/srs/rtcV1Play',
+  '/srs/rtcV1Whep',
 
   '/tencentcloud_css/on_publish',
   '/tencentcloud_css/on_unpublish',
@@ -71,7 +73,10 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   console.log(chalkINFO('===== apiBeforeVerify中间件开始 ====='));
   const startTime = performance.now();
   const url = ctx.request.path;
-  const ip = strSlice(String(ctx.request.headers['x-real-ip']), 490);
+  const client_ip = strSlice(
+    String(ctx.request.headers['x-real-ip'] || ''),
+    100
+  );
   const consoleEnd = () => {
     const duration = Math.floor(performance.now() - startTime);
     console.log(
@@ -89,21 +94,19 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   console.log(chalk.blueBright('token:'), ctx.request.headers.authorization);
 
   // 判断黑名单
-  const inBlacklist = await blacklistController.findByIp(ip);
+  const inBlacklist = await blacklistController.findByIp(client_ip);
 
-  if (inBlacklist?.type === BLACKLIST_TYPE.banIp) {
-    // 频繁操作
+  if (inBlacklist?.type === BlacklistTypeEnum.frequent) {
     throw new CustomError(
-      `当前ip:${ip}调用api频繁,${COMMON_ERROE_MSG.banIp}`,
+      COMMON_ERROE_MSG.frequent,
       COMMON_HTTP_CODE.forbidden,
-      COMMON_ERROR_CODE.banIp
+      COMMON_ERROR_CODE.frequent
     );
-  } else if (inBlacklist?.type === BLACKLIST_TYPE.adminDisableUser) {
-    // 管理员手动禁用
+  } else if (inBlacklist?.type === BlacklistTypeEnum.admin_disable) {
     throw new CustomError(
-      COMMON_ERROE_MSG.userStatusIsDisable,
+      COMMON_ERROE_MSG.admin_disable,
       COMMON_HTTP_CODE.forbidden,
-      COMMON_ERROR_CODE.userStatusIsDisable
+      COMMON_ERROR_CODE.admin_disable
     );
   }
 
@@ -111,19 +114,19 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   // @ts-ignore
   if (frequentlyWhiteList.indexOf(url) === -1) {
     const res = true;
-    // const res = await isPass(ip);
+    // const res = await isPass(client_ip);
     if (!res) {
       const { userInfo } = await authJwt(ctx);
       blacklistController.common.create({
         user_id: userInfo?.id,
-        ip,
-        type: BLACKLIST_TYPE.banIp,
-        msg: COMMON_ERROE_MSG.banIp,
+        client_ip,
+        type: BlacklistTypeEnum.frequent,
+        msg: COMMON_ERROE_MSG.frequent,
       });
       throw new CustomError(
-        `当前ip:${ip}调用api频繁,${COMMON_ERROE_MSG.banIp}`,
+        `ip：${client_ip}，${COMMON_ERROE_MSG.frequent}`,
         COMMON_HTTP_CODE.forbidden,
-        COMMON_ERROR_CODE.banIp
+        COMMON_ERROR_CODE.frequent
       );
     }
   }
@@ -148,10 +151,10 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
     consoleEnd();
     return;
   }
-  const { code, message } = await authJwt(ctx);
+  const { code, msg } = await authJwt(ctx);
   if (code !== COMMON_HTTP_CODE.success) {
     consoleEnd();
-    throw new CustomError(message, code, code);
+    throw new CustomError(msg, code, code);
   }
   /**
    * 因为这个verify.middleware是最先执行的中间件路由，
@@ -164,9 +167,9 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
 };
 
 export async function handleVerifyAuth({ ctx, shouldAuthArr }) {
-  const { code, userInfo, message } = await authJwt(ctx);
+  const { code, userInfo, msg } = await authJwt(ctx);
   if (code !== COMMON_HTTP_CODE.success || !userInfo) {
-    throw new CustomError(message, code, code);
+    throw new CustomError(msg, code, code);
   }
   const myAllAuths = await authController.common.getUserAuth(userInfo.id!);
 

@@ -10,7 +10,7 @@ const router = new Router();
 export function loadAllRoutes(app) {
   router.get('/', async (ctx, next) => {
     ctx.body = {
-      message: `欢迎访问${PROJECT_NAME},当前环境是:${PROJECT_ENV},当前时间:${new Date().toLocaleString()}`,
+      msg: `欢迎访问${PROJECT_NAME},当前环境是:${PROJECT_ENV},当前时间:${new Date().toLocaleString()}`,
     };
     await next();
   });
@@ -19,7 +19,9 @@ export function loadAllRoutes(app) {
   const err: string[] = [];
   fs.readdirSync(__dirname).forEach((file) => {
     try {
-      if (PROJECT_ENV === PROJECT_ENV_ENUM.development) {
+      if (PROJECT_ENV === PROJECT_ENV_ENUM.dev) {
+        if (file === 'index.ts') return;
+      } else if (PROJECT_ENV === PROJECT_ENV_ENUM.beta) {
         if (file === 'index.ts') return;
       } else if (PROJECT_ENV === PROJECT_ENV_ENUM.prod) {
         if (file === 'index.js') return;

@@ -5,7 +5,7 @@ export interface IVisitorLog {
   id?: number;
   live_room_id?: number;
   user_id?: number;
-  ip?: string;
+  client_ip?: string;
   user_agent?: string;
   duration?: number;
   /** 获取一段时间内，每个ip访问的次数的时候添加的 */
@@ -102,7 +102,7 @@ export interface ISigninRecord {
 
 export interface IInitUser extends IUser {
   user_roles: number[];
-  live_room: ILiveRoom & {
+  live_room?: ILiveRoom & {
     devFFmpeg: boolean;
     prodFFmpeg: boolean;
     area: number[];
@@ -134,6 +134,7 @@ export enum GoodsTypeEnum {
   sponsors = 'sponsors',
   gift = 'gift',
   recharge = 'recharge',
+  qypShop = 'qypShop',
 }
 
 export enum DanmuMsgTypeEnum {
@@ -144,92 +145,30 @@ export enum DanmuMsgTypeEnum {
   redbag,
 }
 
-export enum WsMessageMsgIsFileEnum {
-  yes,
-  no,
-}
-
 export enum WsMessageContentTypeEnum {
   txt,
   img,
   video,
 }
 
-export enum WsMessageMsgIsShowEnum {
-  yes,
-  no,
-}
-
-export enum WsMessageMsgIsVerifyEnum {
-  yes,
-  no,
-}
-
 export interface IWsMessage {
   id?: number;
+  live_record_id?: number;
   username?: string;
   origin_username?: string;
   content_type?: WsMessageContentTypeEnum;
   content?: string;
   origin_content?: string;
-  redbag_send_id?: number;
   live_room_id?: number;
   user_id?: number;
-  ip?: string;
+  client_ip?: string;
   msg_type?: DanmuMsgTypeEnum;
   user_agent?: string;
   send_msg_time?: number;
-  is_show?: WsMessageMsgIsShowEnum;
-  is_verify?: WsMessageMsgIsVerifyEnum;
+  is_show?: SwitchEnum;
+  is_bilibili?: SwitchEnum;
   remark?: string;
 
-  user?: IUser;
-  redbag_send?: IRedbagSend;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-export interface IRedbagSend {
-  id?: number;
-
-  user_id?: number;
-  live_room_id?: number;
-
-  total_amount?: string;
-  remaining_amount?: string;
-  total_nums?: number;
-  remaining_nums?: number;
-  remark?: string;
-
-  /** 用户信息 */
-  user?: IUser;
-  /** 直播间信息 */
-  live_room?: IGoods;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
-export enum RedbagIsGrantEnum {
-  yes,
-  no,
-}
-
-export interface IRedbagRecv {
-  id?: number;
-
-  user_id?: number;
-  redbag_send_id?: number;
-  amount?: string;
-  remark?: string;
-
-  /** 抢到红包了，是否已发放 */
-  is_grant?: RedbagIsGrantEnum;
-
-  /** 用户信息 */
   user?: IUser;
 
   created_at?: string;
@@ -274,15 +213,14 @@ export interface IWalletRecord {
 }
 
 export interface ILiveUser {
-  // id: string;
-  // rooms?: string[];
-  // userInfo?: IUser;
-
-  created_at: string;
+  created_at: number;
+  client_ip: string;
   value: {
-    socketId: string;
-    joinRoomId: number;
-    userInfo?: IUser;
+    live_room_id: number;
+    live_room_name: string;
+    user_id: number;
+    user_username: string;
+    user_avatar: string;
   };
 }
 
@@ -394,18 +332,6 @@ export enum FormTypeEnum {
   'datePicker' = 'datePicker',
 }
 
-export interface ILiveConfig {
-  id?: number;
-  key?: string;
-  value?: string;
-  desc?: string;
-  type?: FormTypeEnum;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
 export interface IGoods {
   id?: number;
   type?: GoodsTypeEnum;
@@ -416,6 +342,8 @@ export interface IGoods {
   price?: number;
   original_price?: number;
   nums?: number;
+  pay_nums?: number;
+  inventory?: number;
   badge?: string;
   badge_bg?: string;
   remark?: string;
@@ -425,12 +353,16 @@ export interface IGoods {
   deleted_at?: string;
 }
 
-export interface ISettings {
+export interface IConfig {
   id?: number;
-  key?: string;
-  value?: string;
-  desc?: string;
-  type?: string;
+  field_a?: string;
+  field_b?: string;
+  field_c?: string;
+  field_d?: string;
+  field_e?: string;
+  field_f?: string;
+  field_g?: string;
+  remark?: string;
 
   created_at?: string;
   updated_at?: string;
@@ -532,61 +464,35 @@ export interface ISrsPublishStream {
   flag_id?: string;
 }
 
-export type ILive = {
-  id?: number;
-
-  socket_id?: string;
-  live_room_id?: number;
-  /** 1开启;2关闭 */
-  track_video?: number;
-  /** 1开启;2关闭 */
-  track_audio?: number;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-} & ISrsPublishStream & {
-    /** 直播间信息 */
-    live_room?: ILiveRoom;
-  };
-
-export interface ILivePlay extends ISrsPublishStream {
-  id?: number;
-
-  /** 用户信息 */
-  user?: IUser;
-  /** 直播间信息 */
-  live_room?: ILiveRoom;
-
-  random_id?: string;
-  user_id?: number;
-  live_room_id?: number;
-  end_time?: string;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-}
-
 export interface ILiveRecord {
   id?: number;
-
-  /** 用户信息 */
-  user?: IUser;
-  /** 直播间信息 */
-  live_room?: ILiveRoom;
-
-  client_id?: string;
+  /** 直播平台 */
+  platform?: LivePlatformEnum;
+  /** 直播流名称 */
+  stream_name?: string;
+  /** 直播流id */
+  stream_id?: string;
+  /** 用户id */
   user_id?: number;
+  /** 直播间id */
   live_room_id?: number;
-  /** 直播时长 */
+  /** 直播时长（单位：秒） */
   duration?: number;
   /** 弹幕数 */
   danmu?: number;
   /** 观看数 */
   view?: number;
+  /** 直播开始时间 */
+  start_time?: string;
   /** 直播结束时间 */
   end_time?: string;
+  /** 备注 */
+  remark?: string;
+
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+  /** 用户信息 */
+  user?: IUser;
 
   created_at?: string;
   updated_at?: string;
@@ -595,10 +501,15 @@ export interface ILiveRecord {
 
 export interface IBlacklist {
   id?: number;
-  ip?: string;
+  client_ip?: string;
   user_id?: number;
-  type?: number;
+  type?: BlacklistTypeEnum;
+  start_date?: number;
+  end_date?: number;
   msg?: string;
+  remark?: string;
+
+  user?: IUser;
 
   created_at?: string;
   updated_at?: string;
@@ -656,7 +567,7 @@ export interface ILoginRecord {
   user_id?: number;
   user_agent?: string;
   type?: LoginRecordEnum;
-  ip?: string;
+  client_ip?: string;
   remark?: string;
 
   user?: IUser;
@@ -667,13 +578,18 @@ export interface ILoginRecord {
 }
 
 export enum GlobalMsgTypeEnum {
-  system,
+  user = 'user',
+  system = 'system',
+  activity = 'activity',
 }
 
 export interface IGlobalMsg {
   id?: number;
   user_id?: number;
+  client_ip?: string;
   type?: GlobalMsgTypeEnum;
+  show?: SwitchEnum;
+  priority?: number;
   content?: string;
   remark?: string;
 
@@ -783,4 +699,106 @@ export interface IMinuteData {
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
+}
+
+export enum SwitchEnum {
+  yes,
+  no,
+}
+
+export type ILive = {
+  id?: number;
+  /** 直播记录id */
+  live_record_id?: number;
+  /** 直播平台 */
+  platform?: LivePlatformEnum;
+  /** 直播流名称 */
+  stream_name?: string;
+  /** 直播流id */
+  stream_id?: string;
+  /** 用户id */
+  user_id?: number;
+  /** 直播间id */
+  live_room_id?: number;
+  /** 备注 */
+  remark?: string;
+
+  /** 直播间信息 */
+  live_room?: ILiveRoom;
+  /** 用户信息 */
+  user?: IUser;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+};
+
+/** 直播平台 */
+export enum LivePlatformEnum {
+  rtc,
+  srs,
+  tencentcloud_css,
+}
+
+export enum ClientEnvEnum {
+  android,
+  ios,
+  ipad,
+  web,
+  web_mobile,
+  web_pc,
+  windows,
+  macos,
+}
+
+export interface ILiveView {
+  id?: number;
+  /** 直播记录id */
+  live_record_id?: number;
+  /** 直播间id */
+  live_room_id?: number;
+  /** 用户id */
+  user_id?: number;
+  /** 时长（单位：秒） */
+  duration?: number;
+  user_agent?: string;
+  client_ip?: string;
+  client_env?: ClientEnvEnum;
+  /** 备注 */
+  remark?: string;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IStreamKey {
+  rtmp_url: string;
+  obs_server: string;
+  obs_stream_key: string;
+  webrtc_url: string;
+  srt_url: string;
+}
+
+export interface IPushRes {
+  srsPushRes: IStreamKey;
+  cdnPushRes: IStreamKey;
+}
+
+export enum IThirdPartyLiveStreamingPlatformEnum {
+  bilibili = 'bilibili',
+  douyu = 'douyu',
+  huya = 'huya',
+  douyin = 'douyin',
+  kuaishou = 'kuaishou',
+  xiaohongshu = 'xiaohongshu',
+}
+
+export enum BlacklistTypeEnum {
+  /** 频繁请求 */
+  frequent,
+  /** 管理员禁用 */
+  admin_disable,
+  /** 禁言 */
+  disable_msg,
 }

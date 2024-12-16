@@ -13,9 +13,9 @@ docker run -d registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200
 实际执行效果：
 
 ```bash
-➜  billd-desk-server git:(master) ✗ docker run -d registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200
+➜  billd-live-server git:(master) ✗ docker run -d registry.cn-hangzhou.aliyuncs.com/ossrs/srs:5.0.200
 yyyyyyyyyyyyy
-➜  billd-desk-server git:(master) ✗
+➜  billd-live-server git:(master) ✗
 ```
 
 > 启动容器后，会返回容器的 id
@@ -47,7 +47,7 @@ docker rm yyyyyyyyyyyyy
 ```bash
 LOCAL_DOCKER_SRS_PATH=C:\\Users\\huangshuisheng\\Desktop\\docker\\srs \
 && docker run -d --rm \
---name billd-desk-srs \
+--name billd-live-srs \
 --env CANDIDATE='ip地址' \
 -p 1935:1935 \
 -p 5001:8080 \
@@ -74,9 +74,9 @@ docker run -d mysql:8.0
 实际执行效果：
 
 ```bash
-➜  billd-desk-server git:(master) ✗ docker run -d mysql:8.0
+➜  billd-live-server git:(master) ✗ docker run -d mysql:8.0
 xxxxxxxxx
-➜  billd-desk-server git:(master) ✗
+➜  billd-live-server git:(master) ✗
 ```
 
 > 启动容器后，会返回容器的 id
@@ -105,7 +105,7 @@ docker rm xxxxxxxxx
 LOCAL_DOCKER_MYSQL_PATH=C:\\Users\\huangshuisheng\\Desktop\\docker\\mysql \
 && docker run -d \
 -p 3306:3306 \
---name billd-desk-mysql \
+--name billd-live-mysql \
 -e MYSQL_ROOT_PASSWORD=mysql123. \
 -v $LOCAL_DOCKER_MYSQL_PATH\\conf/my.cnf:/etc/my.cnf \
 -v $LOCAL_DOCKER_MYSQL_PATH\\data:/var/lib/mysql/ \
