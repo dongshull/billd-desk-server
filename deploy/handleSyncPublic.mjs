@@ -11,7 +11,7 @@ const proDir =
   '/Users/huangshuisheng/Desktop/hss/billd-project/billd-desk-server-pro';
 const freeDir =
   '/Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-desk-server';
-const ignoreRootDir = ['.DS_Store', '.git', 'node_modules', 'dist'];
+const ignoreRootDir = ['.DS_Store', '.git', 'node_modules', 'dist', '.husky'];
 const ignoreIndexOf = [
   path.resolve(proDir, 'deploy/docker'),
   path.resolve(proDir, 'deploy/nginx'),
