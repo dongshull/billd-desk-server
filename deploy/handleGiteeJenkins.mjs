@@ -116,6 +116,7 @@ if (process.cwd().indexOf('galaxy-s10') !== -1) {
       // @ts-ignore
       JSON.stringify({ ...proPkg }, {}, 2)
     );
+    console.log(path.resolve(freeDir, 'deploy/deploy.json'), '3333');
     fs.writeFileSync(
       path.resolve(freeDir, 'deploy/deploy.json'),
       // @ts-ignore
