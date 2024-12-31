@@ -1,18 +1,32 @@
-// WARN 该文件只是方便我将当前项目复制一份到我电脑的另一个位置（gitee私有仓库的位置)，其他人不需要管这个文件~
+// WARN 该文件只是方便我将当前项目同步到开源仓库，其他人不需要管这个文件~
 
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+
 import trash from 'trash';
 
-const allFile = [];
-const ignore = ['.DS_Store', '.git', '.gitignore', 'node_modules', 'dist'];
-const localDir =
+let allFile = [];
+const proDir =
   '/Users/huangshuisheng/Desktop/hss/billd-project/billd-desk-server-pro';
-const giteeDir = '/Users/huangshuisheng/Desktop/hss/jenkins/billd-desk-server';
+const freeDir =
+  '/Users/huangshuisheng/Desktop/hss/galaxy-s10/billd-desk-server';
+const ignoreRootDir = ['.DS_Store', '.git', 'node_modules', 'dist'];
+const ignoreIndexOf = [
+  path.resolve(proDir, 'deploy/docker'),
+  path.resolve(proDir, 'deploy/nginx'),
+  path.resolve(proDir, 'deploy/handleSyncPublic.mjs'),
+  path.resolve(proDir, 'src/config'),
+  path.resolve(proDir, 'src/controller'),
+  path.resolve(proDir, 'src/model'),
+  path.resolve(proDir, 'src/secret'),
+  path.resolve(proDir, 'src/service'),
+  path.resolve(proDir, 'src/types'),
+  path.resolve(proDir, 'src/utils'),
+];
 
-const dir = fs.readdirSync(localDir).filter((item) => {
-  if (ignore.includes(item)) {
+const dir = fs.readdirSync(proDir).filter((item) => {
+  if (ignoreRootDir.includes(item)) {
     return false;
   }
   return true;
@@ -21,7 +35,7 @@ const dir = fs.readdirSync(localDir).filter((item) => {
 function findFile(inputDir) {
   for (let i = 0; i < inputDir.length; i += 1) {
     const file = inputDir[i];
-    const filePath = `${localDir}/${file}`;
+    const filePath = `${proDir}/${file}`;
     const stat = fs.statSync(filePath);
     const isDir = stat.isDirectory();
     if (!isDir) {
@@ -36,67 +50,86 @@ function putFile() {
   for (let i = 0; i < allFile.length; i += 1) {
     const file = allFile[i];
     const arr = [];
-    const githubFile = file.replace(localDir, '');
+    const githubFile = file.replace(proDir, '');
     const githubFileArr = githubFile.split('/').filter((item) => item !== '');
     githubFileArr.forEach((item) => {
       if (arr.length) {
         arr.push(path.resolve(arr[arr.length - 1], item));
       } else {
-        arr.push(path.resolve(giteeDir, item));
+        arr.push(path.resolve(freeDir, item));
       }
     });
     arr.forEach((item, index) => {
       // 数组的最后一个一定是文件，因此不需要判断它是不是目录
       if (index !== arr.length - 1) {
         const flag = fs.existsSync(item);
-        // eslint-disable-next-line
+
         !flag && fs.mkdirSync(item);
       }
     });
-    fs.copyFileSync(
-      file,
-      path.join(giteeDir, './', file.replace(localDir, ''))
-    );
+    fs.copyFileSync(file, path.join(freeDir, './', file.replace(proDir, '')));
   }
 }
 
 async function clearOld() {
-  const giteeDirAllFile = fs.readdirSync(giteeDir);
+  const freeDirAllFile = fs.readdirSync(freeDir);
   const queue = [];
-  giteeDirAllFile.forEach((url) => {
-    const fullurl = `${giteeDir}/${url}`;
-    if (!['node_modules', 'src', '.git'].includes(url)) {
+  freeDirAllFile.forEach((url) => {
+    const fullurl = `${freeDir}/${url}`;
+    if (!['node_modules', '.git'].includes(url)) {
       queue.push(trash(fullurl));
     }
   });
   await Promise.all(queue);
-  const queue1 = [];
-  const srcDir = path.resolve(giteeDir, './src');
-  const giteeDirSrcAllFile = fs.readdirSync(srcDir);
-  giteeDirSrcAllFile.forEach((url) => {
-    const fullurl = `${srcDir}/${url}`;
-    // if (!['secret'].includes(url)) {
-    queue1.push(trash(fullurl));
-    // }
-  });
-  await Promise.all(queue1);
 }
 
-if (process.cwd().indexOf('jenkins') !== -1) {
+if (process.cwd().indexOf('galaxy-s10') !== -1) {
   console.log('当前目录错误');
 } else {
   clearOld().then(() => {
     findFile(dir);
-    putFile();
-    const gitignoreTxt =
-      'node_modules\n.DS_Store\ndist\n/public/**/*\n/upload/**/*\n/webm/**/*\n!/public/README.md\n!/upload/README.md\n!/webm/README.md\n';
-    fs.writeFileSync(path.resolve(giteeDir, './.gitignore'), gitignoreTxt);
-    execSync(`git rm -r --cached .`, { cwd: giteeDir });
-    execSync(`pnpm i`, { cwd: giteeDir });
-    execSync(`git add .`, { cwd: giteeDir });
-    execSync(`git commit -m 'feat: ${new Date().toLocaleString()}'`, {
-      cwd: giteeDir,
+    allFile = allFile.filter((x) => {
+      let flag = true;
+      ignoreIndexOf.forEach((y) => {
+        if (x.indexOf(y) === 0) {
+          flag = false;
+        }
+      });
+      return flag;
     });
-    execSync(`git push`, { cwd: giteeDir });
+    putFile();
+
+    const proPkgStr = fs.readFileSync(
+      path.resolve(proDir, 'package.json'),
+      'utf-8'
+    );
+    const proPkg = JSON.parse(proPkgStr);
+    delete proPkg.private;
+    proPkg.name = 'billd-desk';
+    proPkg.repository.url = 'https://github.com/galaxy-s10/billd-desk';
+    proPkg.bugs.url = 'https://github.com/galaxy-s10/billd-desk/issues';
+    // proPkg.devDependencies = {};
+    proPkg.dependencies = {};
+    proPkg.config = {};
+    fs.writeFileSync(
+      path.resolve(freeDir, 'package.json'),
+      // @ts-ignore
+      JSON.stringify({ ...proPkg }, {}, 2)
+    );
+    fs.writeFileSync(
+      path.resolve(freeDir, 'deploy/deploy.json'),
+      // @ts-ignore
+      JSON.stringify({
+        version: proPkg.version,
+        buildDate: new Date().toLocaleString(),
+      })
+    );
+    // execSync(`pnpm i`, { cwd: freeDir });
+    execSync(`git rm -r --cached .`, { cwd: freeDir });
+    execSync(`git add .`, { cwd: freeDir });
+    execSync(`git commit -m 'feat: 优化-${new Date().toLocaleString()}'`, {
+      cwd: freeDir,
+    });
+    execSync(`git push`, { cwd: freeDir });
   });
 }
