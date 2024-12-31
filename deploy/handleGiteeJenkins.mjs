@@ -120,6 +120,7 @@ if (process.cwd().indexOf('galaxy-s10') !== -1) {
       path.resolve(freeDir, 'deploy/deploy.json'),
       // @ts-ignore
       JSON.stringify({
+        name: proPkg.name,
         version: proPkg.version,
         buildDate: new Date().toLocaleString(),
       })
