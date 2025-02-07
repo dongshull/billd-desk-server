@@ -16,12 +16,6 @@ export const PROJECT_PORT = process.env.NODE_APP_RELEASE_PROJECT_PORT as string;
 export const PROJECT_NODE_ENV = process.env.NODE_ENV as string;
 export const PROJECT_INIT_MYSQL = process.env.NODE_APP_INIT_MYSQL as string;
 
-// 七牛云文件上传进度类型
-export enum QINIU_UPLOAD_PROGRESS_TYPE {
-  fileProgress = 1,
-  chunkFileProgress = 2,
-}
-
 export const CORS_ALLOW_ORIGIN: string | string[] = [
   `http://www.${prodDomain}`,
   `https://www.${prodDomain}`,
@@ -85,8 +79,6 @@ export const SECRET_TEMPLATE_FILE =
     ? resolveApp('/dist/secret/secret-template.js')
     : resolveApp('/src/secret/secret-template.ts'); // 秘钥文件模板
 
-export const MAX_BITRATE = 1000 * 3; // 最大码率，3m
-
 export const SERVER_VIDEO_DIR = '/node/video/'; // 服务器video目录
 export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
 export const DOMAIN_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
@@ -100,10 +92,6 @@ export const COMMON_ERROR_CODE = {
   shutdown: 1004, // 停机维护
   idOrPwdError: 1005, // 账号或密码错误！
   usernameOrPwdError: 1006, // 用户名或密码错误！
-  todayAlreadySignin: 1007, // 今天已签到过了！
-  alreadyGetRedbag: 1008, // 今天已签到过了！
-  redbagAlreadySnatched: 1009, // 红包已经被抢完！
-  balanceNotEnough: 1010, // 余额不足
   userStatusNoNormal: 1011, // 用户状态非正常
 };
 
@@ -132,11 +120,8 @@ export const COMMON_ERROE_MSG = {
   forbidden: '权限不足！', // 权限不足！
   notFound: '未找到！', // 未找到！
   serverError: '服务器错误！', // 服务器错误！
-  idOrPwdError: '账号或密码错误！', // 账号或密码错误！
+  idOrPwdError: '用户ID或密码错误！', // 用户ID或密码错误！
   usernameOrPwdError: '用户名或密码错误！', // 用户名或密码错误！
-  todayAlreadySignin: '今天已签到过了！', // 今天已签到过了！
-  alreadyGetRedbag: '你已经领取过红包', // 你已经领取过红包
-  redbagAlreadySnatched: '红包已经被抢完！', // 红包已经被抢完！
 };
 
 export const COMMON_SUCCESS_MSG = {
@@ -149,8 +134,6 @@ export const COMMON_SUCCESS_MSG = {
 };
 
 export const SCHEDULE_TYPE = {
-  verifyStream: 'handleVerifyStream',
-  blobIsExist: 'blobIsExist',
   liveRoomIsLive: 'liveRoomIsLive',
 };
 
@@ -162,32 +145,15 @@ export const REDIS_KEY = {
   emailRegister: `${REDIS_PREFIX_ENV}emailRegister___`, // 邮箱注册
   userBindEmail: `${REDIS_PREFIX_ENV}userBindEmail___`, // 用户绑定邮箱
   userCancelBindEmail: `${REDIS_PREFIX_ENV}userCancelBindEmail___`, // 用户取消绑定邮箱
-  joined: `${REDIS_PREFIX_ENV}joined___`, // 用户加入了房间
-  order: `${REDIS_PREFIX_ENV}order___`, // 订单
-  fileProgress: `${REDIS_PREFIX_ENV}fileProgress___`, // 文件上传进度
   qrCodeLogin: `${REDIS_PREFIX_ENV}qrCodeLogin___`, // 二维码登录
-  livePkKey: `${REDIS_PREFIX_ENV}livePkKey___`, // 直播间打pk秘钥
-  dbLiveList: `${REDIS_PREFIX_ENV}dbLiveList___`, // 直播间在线列表
-  dbLiveRoomHistoryMsgList: `${REDIS_PREFIX_ENV}dbLiveRoomHistoryMsgList___`, // 直播间历史消息
   deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
   deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
-  tencentcloudCssPublishing: `${REDIS_PREFIX_ENV}tencentcloudCssPublishing___`,
-  srsPublishing: `${REDIS_PREFIX_ENV}srsPublishing___`,
-  rtcLiving: `${REDIS_PREFIX_ENV}rtcLiving___`,
-  keepJoined: `${REDIS_PREFIX_ENV}keepJoined___`, // 用户加入了房间
 };
 
 // redis 频道
 export const REDIS_CHANNEL = {
   writeDbLog: `${REDIS_PREFIX_ENV}writeDbLog___`,
 };
-
-// rabbitmq 频道
-export const RABBITMQ_CHANNEL = {
-  order: `${REDIS_PREFIX_ENV}order___`,
-};
-
-export const IS_UPLOAD_SERVER = !(PROJECT_ENV === PROJECT_ENV_ENUM.prod); // 是否上传到服务器
 
 // 平台类型
 export const THIRD_PLATFORM = {
@@ -213,65 +179,9 @@ export const DEFAULT_AUTH_INFO = {
     id: 4,
     auth_value: 'AUTH_MANAGE',
   },
-  MESSAGE_MANAGE: {
-    id: 5,
-    auth_value: 'MESSAGE_MANAGE',
-  },
-  MESSAGE_SEND: {
-    id: 6,
-    auth_value: 'MESSAGE_SEND',
-  },
-  MESSAGE_DISABLE: {
-    id: 7,
-    auth_value: 'MESSAGE_DISABLE',
-  },
   LOG_MANAGE: {
-    id: 8,
+    id: 5,
     auth_value: 'LOG_MANAGE',
-  },
-  LIVE_MANAGE: {
-    id: 9,
-    auth_value: 'LIVE_MANAGE',
-  },
-  LIVE_PUSH: {
-    id: 10,
-    auth_value: 'LIVE_PUSH',
-  },
-  LIVE_PULL: {
-    id: 11,
-    auth_value: 'LIVE_PULL',
-  },
-  LIVE_PULL_SVIP: {
-    id: 12,
-    auth_value: 'LIVE_PULL_SVIP',
-  },
-  LIVE_PUSH_CDN: {
-    id: 13,
-    auth_value: 'LIVE_PUSH_CDN',
-  },
-  LIVE_PUSH_FORWARD_BILIBILI: {
-    id: 14,
-    auth_value: 'LIVE_PUSH_FORWARD_BILIBILI',
-  },
-  LIVE_PUSH_FORWARD_HUYA: {
-    id: 15,
-    auth_value: 'LIVE_PUSH_FORWARD_HUYA',
-  },
-  LIVE_PUSH_FORWARD_DOUYU: {
-    id: 16,
-    auth_value: 'LIVE_PUSH_FORWARD_DOUYU',
-  },
-  LIVE_PUSH_FORWARD_DOUYIN: {
-    id: 17,
-    auth_value: 'LIVE_PUSH_FORWARD_DOUYIN',
-  },
-  LIVE_PUSH_FORWARD_KUAISHOU: {
-    id: 18,
-    auth_value: 'LIVE_PUSH_FORWARD_KUAISHOU',
-  },
-  LIVE_PUSH_FORWARD_XIAOHONGSHU: {
-    id: 19,
-    auth_value: 'LIVE_PUSH_FORWARD_XIAOHONGSHU',
   },
 };
 
@@ -288,53 +198,20 @@ export const DEFAULT_ROLE_INFO = {
     id: 3,
     role_value: 'SUPER_ADMIN',
   },
-  LIVE_ADMIN: {
-    id: 4,
-    role_value: 'LIVE_ADMIN',
-  },
   USER: {
-    id: 5,
+    id: 4,
     role_value: 'USER',
   },
   VIP_USER: {
-    id: 6,
+    id: 5,
     role_value: 'VIP_USER',
   },
   SVIP_USER: {
-    id: 7,
+    id: 6,
     role_value: 'SVIP_USER',
   },
   TOURIST_USER: {
-    id: 8,
+    id: 7,
     role_value: 'TOURIST_USER',
   },
 };
-
-export const SRS_CB_URL_QUERY = {
-  publishKey: 'pushkey',
-  publishType: 'pushtype',
-  userToken: 'usertoken',
-  userId: 'userid',
-  randomId: 'randomid',
-  roomId: 'roomid',
-  isdev: 'isdev',
-};
-
-export const LIVE_ROOM_MODEL_EXCLUDE = [
-  'push_rtmp_url',
-  'push_obs_server',
-  'push_obs_stream_key',
-  'push_webrtc_url',
-  'push_srt_url',
-  'push_cdn_rtmp_url',
-  'push_cdn_obs_server',
-  'push_cdn_obs_stream_key',
-  'push_cdn_webrtc_url',
-  'push_cdn_srt_url',
-  'forward_bilibili_url',
-  'forward_huya_url',
-  'forward_douyu_url',
-  'forward_douyin_url',
-  'forward_kuaishou_url',
-  'forward_xiaohongshu_url',
-];

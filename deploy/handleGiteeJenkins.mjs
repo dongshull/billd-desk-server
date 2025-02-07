@@ -65,21 +65,11 @@ async function clearOld() {
   const queue = [];
   giteeDirAllFile.forEach((url) => {
     const fullurl = `${giteeDir}/${url}`;
-    if (!['node_modules', 'src', '.git'].includes(url)) {
+    if (!['node_modules', '.git'].includes(url)) {
       queue.push(trash(fullurl));
     }
   });
   await Promise.all(queue);
-  const queue1 = [];
-  const srcDir = path.resolve(giteeDir, './src');
-  const giteeDirSrcAllFile = fs.readdirSync(srcDir);
-  giteeDirSrcAllFile.forEach((url) => {
-    const fullurl = `${srcDir}/${url}`;
-    // if (!['secret'].includes(url)) {
-    queue1.push(trash(fullurl));
-    // }
-  });
-  await Promise.all(queue1);
 }
 
 if (process.cwd().indexOf('jenkins') !== -1) {

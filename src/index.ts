@@ -5,7 +5,6 @@ import './init/initFile';
 import { performance } from 'perf_hooks';
 
 import { connectMysql } from '@/config/mysql';
-import { connectRabbitMQ } from '@/config/rabbitmq';
 import { connectRedis } from '@/config/redis';
 import { connectRedisPub } from '@/config/redis/publish';
 import { connectRedisSub } from '@/config/redis/subscribe';
@@ -24,23 +23,22 @@ import {
   chalkWARN,
 } from '@/utils/chalkTip';
 
-import { connectRabbitMQConsumer } from './config/rabbitmq/consumer';
-import { connectRabbitMQProducer } from './config/rabbitmq/producer';
-
 const start = performance.now();
 
 async function main() {
   function adLog() {
     console.log();
 
-    console.log(chalkINFO(`作者微信:    shuisheng9905`));
-    console.log(chalkINFO(`付费课程:    https://www.hsslive.cn/article/151`));
+    console.log(chalkINFO(`联系作者:    https://desk.hsslive.cn/#/hi`));
+    console.log(chalkINFO(`订阅仓库:    https://desk.hsslive.cn/#/price`));
     console.log(
-      chalkINFO(`私有化部署:   https://live.hsslive.cn/privatizationDeployment`)
+      chalkINFO(
+        `私有化部署:   https://desk.hsslive.cn/#/privatizationDeployment`
+      )
     );
     console.log(
       chalkINFO(
-        `欢迎PR:      billd-live目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
+        `欢迎PR:      billd-desk目前只有作者一人开发，难免有不足的地方，欢迎提PR或Issue`
       )
     );
     console.log();
@@ -59,12 +57,9 @@ async function main() {
       connectRedis(), // 连接redis
       connectRedisPub(), // 连接redis的发布
       connectRedisSub(), // 连接redis的订阅
-      connectRabbitMQ(), // 连接rabbitmq
-      connectRabbitMQProducer(), // 连接rabbitmq的生产者
-      connectRabbitMQConsumer(), // 连接rabbitmq的消费者
     ]);
   } catch (error) {
-    console.log(chalkERROR('rabbitmq、mysql、redis初始化失败！'));
+    console.log(chalkERROR('mysql、redis初始化失败！'));
     console.log(error);
     // 触发pm2的重启进程
     process.exit(1);

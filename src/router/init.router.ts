@@ -38,14 +38,6 @@ initRouter.post(
   initController.rbacMode
 );
 
-// 初始化商品
-initRouter.post(
-  '/goods',
-  apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
-  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
-  initController.initGoods
-);
-
 // 初始化时间表
 initRouter.post(
   '/day_data',
@@ -85,14 +77,6 @@ initRouter.post(
   initController.initUser
 );
 
-// 初始化用户钱包
-initRouter.post(
-  '/user_wallet',
-  apiVerifyEnv([PROJECT_ENV_ENUM.dev]),
-  apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
-  initController.initUserWallet
-);
-
 // 重建表
 initRouter.post(
   '/force_table',
@@ -108,7 +92,5 @@ initRouter.post(
   apiVerifyAuth([DEFAULT_AUTH_INFO.ALL_AUTH.auth_value]),
   initController.deleteUser
 );
-
-initRouter.post('/resetLiveRoomUrl', initController.resetLiveRoomUrl);
 
 export default initRouter;

@@ -10,11 +10,8 @@ import { apiBeforeVerify } from '@/app/verify.middleware';
 import { initSchedule } from '@/config/schedule';
 import { connectWebSocket } from '@/config/websocket';
 import { COMMON_HTTP_CODE, STATIC_DIR, UPLOAD_DIR } from '@/constant';
-import { initFFmpeg } from '@/init/initFFmpeg';
 import { CustomError } from '@/model/customError.model';
 import { loadAllRoutes } from '@/router';
-import { countdown } from '@/utils';
-import { pushToBilibili } from '@/utils/process';
 
 export async function setupKoa({ port }) {
   const app = new Koa();
@@ -69,16 +66,4 @@ export async function setupKoa({ port }) {
     connectWebSocket(httpServer); // 初始化websocket
   }); // http接口服务
   initSchedule();
-  pushToBilibili(false);
-  const useInitFFmpeg = true;
-  if (useInitFFmpeg) {
-    setTimeout(() => {
-      const countdownInitFFmpegDelay = 3;
-      countdown({ seconds: countdownInitFFmpegDelay });
-      setTimeout(() => {
-        // 初始化FFmpeg推流
-        initFFmpeg(true);
-      }, 1000 * (countdownInitFFmpegDelay + 1));
-    }, 500);
-  }
 }

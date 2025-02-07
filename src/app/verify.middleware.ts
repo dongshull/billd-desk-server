@@ -3,16 +3,8 @@ import chalk from 'chalk';
 import { ParameterizedContext } from 'koa';
 
 import { authJwt } from '@/app/auth/authJwt';
-import {
-  COMMON_ERROE_MSG,
-  COMMON_ERROR_CODE,
-  COMMON_HTTP_CODE,
-  PROJECT_ENV,
-  PROJECT_ENV_ENUM,
-} from '@/constant';
+import { COMMON_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import authController from '@/controller/auth.controller';
-import blacklistController from '@/controller/blacklist.controller';
-import { BlacklistTypeEnum } from '@/interface';
 import { CustomError } from '@/model/customError.model';
 import { strSlice } from '@/utils';
 import { chalkINFO } from '@/utils/chalkTip';
@@ -26,6 +18,7 @@ const frontendWhiteList = [
 
   '/user/register', // 注册，这个接口是post的
   '/user/login', // 登录，这个接口是post的
+  '/user/id_login', // 登录，这个接口是post的
   '/user/username_login', // 登录，这个接口是post的
   '/user/qrcode_login', // 登录，这个接口是post的
 
@@ -50,17 +43,11 @@ const frontendWhiteList = [
   '/desk_user/update_by_uuid',
   '/desk_user/link_verify',
 
-  '/srs/on_publish',
-  '/srs/on_play',
-  '/srs/on_stop',
-  '/srs/on_unpublish',
-  '/srs/on_dvr',
-  '/srs/rtcV1Play',
-  '/srs/rtcV1Whep',
-
   '/tencentcloud_css/on_publish',
   '/tencentcloud_css/on_unpublish',
   '/tencentcloud_css/remote_auth',
+
+  '/tencentcloud_chat/gen_user_sig',
 ];
 
 // 全局白名单
@@ -92,44 +79,6 @@ export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   console.log(chalk.blueBright('referer:'), ctx.request.header.referer);
   console.log(chalk.blueBright('cookie:'), ctx.request.header.cookie);
   console.log(chalk.blueBright('token:'), ctx.request.headers.authorization);
-
-  // 判断黑名单
-  const inBlacklist = await blacklistController.findByIp(client_ip);
-
-  if (inBlacklist?.type === BlacklistTypeEnum.frequent) {
-    throw new CustomError(
-      COMMON_ERROE_MSG.frequent,
-      COMMON_HTTP_CODE.forbidden,
-      COMMON_ERROR_CODE.frequent
-    );
-  } else if (inBlacklist?.type === BlacklistTypeEnum.admin_disable) {
-    throw new CustomError(
-      COMMON_ERROE_MSG.admin_disable,
-      COMMON_HTTP_CODE.forbidden,
-      COMMON_ERROR_CODE.admin_disable
-    );
-  }
-
-  // 验证是否频繁请求
-  // @ts-ignore
-  if (frequentlyWhiteList.indexOf(url) === -1) {
-    const res = true;
-    // const res = await isPass(client_ip);
-    if (!res) {
-      const { userInfo } = await authJwt(ctx);
-      blacklistController.common.create({
-        user_id: userInfo?.id,
-        client_ip,
-        type: BlacklistTypeEnum.frequent,
-        msg: COMMON_ERROE_MSG.frequent,
-      });
-      throw new CustomError(
-        `ip：${client_ip}，${COMMON_ERROE_MSG.frequent}`,
-        COMMON_HTTP_CODE.forbidden,
-        COMMON_ERROR_CODE.frequent
-      );
-    }
-  }
 
   let allowNext = false;
   globalWhiteList.forEach((item) => {
