@@ -1,4 +1,4 @@
-import { prodDomain } from './spec-config';
+import { PROD_DOMAIN } from './spec-config';
 import { resolveApp } from './utils';
 
 export enum PROJECT_ENV_ENUM {
@@ -17,22 +17,22 @@ export const PROJECT_NODE_ENV = process.env.NODE_ENV as string;
 export const PROJECT_INIT_MYSQL = process.env.NODE_APP_INIT_MYSQL as string;
 
 export const CORS_ALLOW_ORIGIN: string | string[] = [
-  `http://www.${prodDomain}`,
-  `https://www.${prodDomain}`,
-  `http://admin.${prodDomain}`,
-  `https://admin.${prodDomain}`,
-  `http://live.${prodDomain}`,
-  `https://live.${prodDomain}`,
-  `http://live-admin.${prodDomain}`,
-  `https://live-admin.${prodDomain}`,
-  `http://nuxt2.${prodDomain}`,
-  `https://nuxt2.${prodDomain}`,
-  `http://next.${prodDomain}`,
-  `https://next.${prodDomain}`,
-  `http://project.${prodDomain}`,
-  `https://project.${prodDomain}`,
-  `http://desk.${prodDomain}`,
-  `https://desk.${prodDomain}`,
+  `http://www.${PROD_DOMAIN}`,
+  `https://www.${PROD_DOMAIN}`,
+  `http://admin.${PROD_DOMAIN}`,
+  `https://admin.${PROD_DOMAIN}`,
+  `http://live.${PROD_DOMAIN}`,
+  `https://live.${PROD_DOMAIN}`,
+  `http://live-admin.${PROD_DOMAIN}`,
+  `https://live-admin.${PROD_DOMAIN}`,
+  `http://nuxt2.${PROD_DOMAIN}`,
+  `https://nuxt2.${PROD_DOMAIN}`,
+  `http://next.${PROD_DOMAIN}`,
+  `https://next.${PROD_DOMAIN}`,
+  `http://project.${PROD_DOMAIN}`,
+  `https://project.${PROD_DOMAIN}`,
+  `http://desk.${PROD_DOMAIN}`,
+  `https://desk.${PROD_DOMAIN}`,
 ];
 
 /** 消息最大长度 */
@@ -78,10 +78,6 @@ export const SECRET_TEMPLATE_FILE =
   PROJECT_ENV === PROJECT_ENV_ENUM.prod
     ? resolveApp('/dist/secret/secret-template.js')
     : resolveApp('/src/secret/secret-template.ts'); // 秘钥文件模板
-
-export const SERVER_VIDEO_DIR = '/node/video/'; // 服务器video目录
-export const LOCALHOST_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
-export const DOMAIN_URL = 'localhost'; // 本地地址，一般是localhost或者127.0.0.1，但也可以是其他本地地址，如192.168.x.x
 
 export const COMMON_ERROR_CODE = {
   serverError: 10000, // 服务器错误

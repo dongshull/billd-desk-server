@@ -2,11 +2,7 @@ import { IUser } from '@/types/IUser';
 
 export interface IInitUser extends IUser {
   user_roles: number[];
-  devFFmpeg: boolean;
-  prodFFmpeg: boolean;
   area: number[];
-  devFFmpegLocalFile: string;
-  prodFFmpegLocalFile: string;
 }
 
 export enum liveEnum {
