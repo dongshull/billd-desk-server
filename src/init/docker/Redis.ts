@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 
 import { REDIS_CONFIG } from '@/secret/secret';
-import { chalkERROR, chalkSUCCESS, chalkWARN, emoji } from '@/utils/chalkTip';
+import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
 export const dockerRunRedis = (init = true) => {
   if (!init) return;
@@ -42,7 +42,7 @@ export const dockerRunRedis = (init = true) => {
       -v ${REDIS_CONFIG.docker.volume}/conf/users.acl:/etc/redis/users.acl \
       ${REDIS_CONFIG.docker.image} redis-server /etc/redis/redis.conf`
     );
-    console.log(chalkSUCCESS(`启动Redis成功！`), emoji.get('✅'));
+    console.log(chalkSUCCESS(`启动Redis成功！`));
   } catch (error) {
     console.log(chalkERROR(`启动Redis错误！`));
     console.log(error);

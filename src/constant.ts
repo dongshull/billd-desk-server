@@ -137,19 +137,14 @@ export const REDIS_PREFIX_ENV = `${PROJECT_NAME}-${PROJECT_ENV}-`;
 
 // redis key前缀
 export const REDIS_KEY = {
-  emailLogin: `${REDIS_PREFIX_ENV}emailLogin___`, // 邮箱登录
-  emailRegister: `${REDIS_PREFIX_ENV}emailRegister___`, // 邮箱注册
-  userBindEmail: `${REDIS_PREFIX_ENV}userBindEmail___`, // 用户绑定邮箱
-  userCancelBindEmail: `${REDIS_PREFIX_ENV}userCancelBindEmail___`, // 用户取消绑定邮箱
   qrCodeLogin: `${REDIS_PREFIX_ENV}qrCodeLogin___`, // 二维码登录
   deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
   deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
+  deskInviteId: `${REDIS_PREFIX_ENV}deskInviteId___`,
 };
 
 // redis 频道
-export const REDIS_CHANNEL = {
-  writeDbLog: `${REDIS_PREFIX_ENV}writeDbLog___`,
-};
+export const REDIS_CHANNEL = {};
 
 // 平台类型
 export const THIRD_PLATFORM = {

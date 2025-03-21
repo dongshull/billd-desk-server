@@ -1,69 +1,24 @@
 import { ParameterizedContext } from 'koa';
 
-import { authJwt } from '@/app/auth/authJwt';
-import { pubClient } from '@/config/redis/publish';
 import {
   COMMON_ERROR_CODE,
   COMMON_HTTP_CODE,
   CORS_ALLOW_ORIGIN,
-  PROJECT_ENV,
-  REDIS_CHANNEL,
 } from '@/constant';
 import { CustomError } from '@/model/customError.model';
-import { handleCtxRequestHeaders, strSlice } from '@/utils';
+import { strSlice } from '@/utils';
 import { chalkERROR, chalkINFO, chalkSUCCESS } from '@/utils/chalkTip';
 
 // 全局错误处理中间件
 export const catchErrorMiddle = async (ctx: ParameterizedContext, next) => {
-  const insertLog = async (info: {
+  const insertLog = (info: {
     httpStatusCode: number;
     errorCode: number;
     duration: number;
     error: string;
     msg: string;
   }) => {
-    try {
-      if (PROJECT_ENV !== 'beta') {
-        if ([200, 304].includes(info.httpStatusCode)) {
-          return;
-        }
-        // 将请求写入日志表
-        const { userInfo } = await authJwt(ctx);
-        const api_body = strSlice(JSON.stringify(ctx.request.body), 2000);
-        const api_query = strSlice(JSON.stringify(ctx.request.query), 2000);
-        const headers = handleCtxRequestHeaders(ctx);
-        const api_user_agent = headers.user_agent;
-        const api_real_ip = headers.real_ip;
-        const api_forwarded_for = headers.forwarded_for;
-        const api_referer = headers.referer;
-        const api_path = headers.path;
-        pubClient.publish(
-          REDIS_CHANNEL.writeDbLog,
-          JSON.stringify({
-            user_id: userInfo?.id || -1,
-            api_user_agent,
-            api_body,
-            api_query,
-            api_real_ip,
-            api_forwarded_for,
-            api_referer,
-            api_path,
-            api_method: ctx.request.method,
-            // ctx.request.host存在时获取主机（hostname:port）。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
-            api_host: ctx.request.host, // ctx.request.hostname不带端口号;ctx.request.host带端口号
-            // ctx.request.hostname存在时获取主机名。当 app.proxy 是 true 时支持 X-Forwarded-Host，否则使用 Host。
-            api_hostname: ctx.request.hostname, // ctx.request.hostname不带端口号;ctx.request.host带端口号
-            api_status_code: info.httpStatusCode,
-            api_error: info.error,
-            api_err_msg: info.msg,
-            api_duration: info.duration,
-            api_err_code: info.errorCode,
-          })
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    console.log(info);
   };
   let duration = -1;
   try {
@@ -196,7 +151,7 @@ export const corsMiddle = async (ctx: ParameterizedContext, next) => {
   const startTime = performance.now();
   ctx.set(
     'Access-Control-Allow-Headers',
-    'Content-Type, Content-Length, Authorization, Accept, X-Requested-With'
+    'Content-Type, Content-Length, Authorization, Accept, X-Billd-Trace-Id, X-Requested-With, X-Billd-Env, X-Billd-App, X-Billd-Appver'
   ); // 允许的请求头
   ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS'); // 允许的方法
 

@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 
 import { MYSQL_CONFIG } from '@/secret/secret';
-import { chalkERROR, chalkSUCCESS, chalkWARN, emoji } from '@/utils/chalkTip';
+import { chalkERROR, chalkSUCCESS, chalkWARN } from '@/utils/chalkTip';
 
 export const dockerRunMysql = (init = true) => {
   if (!init) return;
@@ -42,7 +42,7 @@ export const dockerRunMysql = (init = true) => {
       -v ${MYSQL_CONFIG.docker.volume}/data:/var/lib/mysql/ \
       ${MYSQL_CONFIG.docker.image}`
     );
-    console.log(chalkSUCCESS(`启动Mysql成功！`), emoji.get('✅'));
+    console.log(chalkSUCCESS(`启动Mysql成功！`));
   } catch (error) {
     console.log(chalkERROR(`启动Mysql错误！`));
     console.log(error);

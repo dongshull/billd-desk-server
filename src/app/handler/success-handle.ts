@@ -18,6 +18,11 @@ const successHandler = ({
   const methods = ctx.request.method;
 
   ctx.status = httpStatusCode; // 不手动设置状态的话，koa默认方法返回404，delete方法返回400
+  const traceId = ctx.request.headers['x-billd-trace-id'] as string;
+  if (traceId) {
+    ctx.response.append('X-Billd-Trace-Id', traceId);
+  }
+
   ctx.body = {
     code,
     data,

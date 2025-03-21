@@ -48,6 +48,8 @@ const frontendWhiteList = [
   '/tencentcloud_css/remote_auth',
 
   '/tencentcloud_chat/gen_user_sig',
+  '/invite/create',
+  '/invite/del',
 ];
 
 // 全局白名单
