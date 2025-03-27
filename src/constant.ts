@@ -139,7 +139,8 @@ export const REDIS_PREFIX_ENV = `${PROJECT_NAME}-${PROJECT_ENV}-`;
 export const REDIS_KEY = {
   qrCodeLogin: `${REDIS_PREFIX_ENV}qrCodeLogin___`, // 二维码登录
   deskUserUuid: `${REDIS_PREFIX_ENV}deskUserUuid___`,
-  deskUserSocketId: `${REDIS_PREFIX_ENV}deskUserSocketId___`,
+  socketIdAlive: `${REDIS_PREFIX_ENV}socketIdAlive___`,
+  uuidInRemoting: `${REDIS_PREFIX_ENV}uuidInRemoting___`,
   deskInviteId: `${REDIS_PREFIX_ENV}deskInviteId___`,
 };
 

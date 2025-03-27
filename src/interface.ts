@@ -47,14 +47,30 @@ export interface IDeskVersion {
   disable?: number;
   /** 禁用消息 */
   disable_msg?: number;
-  download_macos_dmg?: string;
-  download_windows_64_exe?: string;
-  download_windows_32_exe?: string;
+  /** macos 32位ARM */
+  download_macos_arm_dmg?: string;
+  /** macos 64位ARM */
+  download_macos_arm64_dmg?: string;
+  /** macos 64位X86，X86是x86_64 或 amd64的别名  */
+  download_macos_x64_dmg?: string;
+  /** windows 32位ARM */
   download_windows_arm_exe?: string;
-  download_linux_64_deb?: string;
-  download_linux_64_tar?: string;
+  /** windows 64位ARM */
+  download_windows_arm64_exe?: string;
+  /** windows 64位X86，X86是x86_64 或 amd64的别名 */
+  download_windows_x64_exe?: string;
+  /** linux 32位ARM */
+  download_linux_arm_appimage?: string;
+  /** linux 64位ARM */
+  download_linux_arm64_appimage?: string;
+  /** linux 64位X86，X86是x86_64 或 amd64的别名 */
+  download_linux_x64_appimage?: string;
+  /** linux deb 32位ARM */
   download_linux_arm_deb?: string;
-  download_linux_arm_tar?: string;
+  /** linux deb 64位ARM */
+  download_linux_arm64_deb?: string;
+  /** linux deb 64位X86，X86是x86_64 或 amd64的别名 */
+  download_linux_x64_deb?: string;
   remark?: string;
 
   created_at?: string;
@@ -182,31 +198,6 @@ export enum SwitchEnum {
   yes,
   no,
 }
-
-export type ILive = {
-  id?: number;
-  /** 直播记录id */
-  live_record_id?: number;
-  /** 用户id */
-  user_id?: number;
-  /** 直播间id */
-  live_room_id?: number;
-  /** 直播流名称 */
-  stream_name?: string;
-  /** 直播流id */
-  stream_id?: string;
-  /** 这次直播的标识id（用于推拉流回调） */
-  flag_id?: string;
-  /** 备注 */
-  remark?: string;
-
-  /** 用户信息 */
-  user?: IUser;
-
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
-};
 
 export enum ClientEnvEnum {
   android,

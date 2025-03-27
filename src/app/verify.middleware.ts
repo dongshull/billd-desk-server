@@ -50,6 +50,7 @@ const frontendWhiteList = [
   '/tencentcloud_chat/gen_user_sig',
   '/invite/create',
   '/invite/del',
+  '/invite/keep_alive',
 ];
 
 // 全局白名单
