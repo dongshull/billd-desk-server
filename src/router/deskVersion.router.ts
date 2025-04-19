@@ -10,4 +10,6 @@ deskUserRouter.get('/latest', deskVersionController.latest);
 
 deskUserRouter.get('/find_by_version', deskVersionController.findByVersion);
 
+deskUserRouter.get('/find_all_version', deskVersionController.findAllVersion);
+
 export default deskUserRouter;

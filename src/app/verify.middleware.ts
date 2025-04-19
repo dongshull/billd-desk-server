@@ -6,7 +6,6 @@ import { authJwt } from '@/app/auth/authJwt';
 import { COMMON_HTTP_CODE, PROJECT_ENV, PROJECT_ENV_ENUM } from '@/constant';
 import authController from '@/controller/auth.controller';
 import { CustomError } from '@/model/customError.model';
-import { strSlice } from '@/utils';
 import { chalkINFO } from '@/utils/chalkTip';
 
 // 前台的所有get和白名单内的接口不需要token
@@ -51,22 +50,32 @@ const frontendWhiteList = [
   '/invite/create',
   '/invite/del',
   '/invite/keep_alive',
+
+  '/ws/keep_alive',
+
+  '/screen_wall/set_img',
+  '/screen_wall/add_group',
+  '/screen_wall/add_data',
+  '/screen_wall/edit_data',
+  '/screen_wall/del_data',
+  '/screen_wall/del_group',
+  '/screen_wall/edit_group',
 ];
 
 // 全局白名单
 const globalWhiteList = ['/init/'];
 
 // 允许频繁请求的路径白名单
-const frequentlyWhiteList = [];
+// const frequentlyWhiteList = [];
 
 export const apiBeforeVerify = async (ctx: ParameterizedContext, next) => {
   console.log(chalkINFO('===== apiBeforeVerify中间件开始 ====='));
   const startTime = performance.now();
   const url = ctx.request.path;
-  const client_ip = strSlice(
-    String(ctx.request.headers['x-real-ip'] || ''),
-    100
-  );
+  // const client_ip = strSlice(
+  //   String(ctx.request.headers['x-real-ip'] || ''),
+  //   100
+  // );
   const consoleEnd = () => {
     const duration = Math.floor(performance.now() - startTime);
     console.log(

@@ -22,6 +22,8 @@ export async function setupKoa({ port }) {
   app.use(catchErrorMiddle); // 全局错误处理
   app.use(
     koaBody({
+      jsonLimit: '10mb',
+      formLimit: '10mb',
       multipart: true,
       formidable: {
         // 上传目录

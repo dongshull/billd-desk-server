@@ -142,6 +142,7 @@ export const REDIS_KEY = {
   socketIdAlive: `${REDIS_PREFIX_ENV}socketIdAlive___`,
   uuidInRemoting: `${REDIS_PREFIX_ENV}uuidInRemoting___`,
   deskInviteId: `${REDIS_PREFIX_ENV}deskInviteId___`,
+  screenWall: `${REDIS_PREFIX_ENV}screenWall___`,
 };
 
 // redis 频道

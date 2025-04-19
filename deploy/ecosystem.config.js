@@ -5,6 +5,8 @@ const data = {
   instances: 1,
   script: './dist/index.js',
   log_date_format: 'YYYY-MM-DD HH:mm:ss:SSS',
+  out_file: '/root/.pm2/logs/billd-desk-server-ok.log',
+  error_file: '/root/.pm2/logs/billd-desk-server-err.log',
   watch: false,
   env: {
     NODE_APP_RELEASE_PROJECT_NAME: 'billd-desk-server',
