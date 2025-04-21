@@ -12,7 +12,7 @@ export enum liveEnum {
 
 export interface IDeskConfig {
   id?: number;
-  type?: number;
+  type?: string;
   field_a?: string;
   field_b?: string;
   field_c?: string;
@@ -27,14 +27,14 @@ export interface IDeskConfig {
   deleted_at?: string;
 }
 
-export enum DeskConfigEnum {
-  electronVersionConfig,
-  flutterVersionConfig,
+export enum DeskConfigTypeEnum {
+  electronVersionConfig = 'electronVersionConfig',
+  flutterVersionConfig = 'flutterVersionConfig',
 }
 
 export interface IDeskVersion {
   id?: number;
-  type?: string;
+  type?: number;
   /** 1:强制更新; 2:不强制更新 */
   force?: number;
   /** 版本 */
@@ -235,6 +235,44 @@ export interface IScreenWall {
   group_name?: string;
   c_uuid?: string;
   c_password?: string;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export interface IShorturl {
+  id?: number;
+  type?: string;
+  code?: string;
+  url?: string;
+  remark?: string;
+
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+
+export enum GlobalMsgTypeEnum {
+  user = 'user',
+  system = 'system',
+  activity = 'activity',
+  notification = 'notification',
+}
+
+export interface IGlobalMsg {
+  id?: number;
+  user_id?: number;
+  client_ip?: string;
+  type?: GlobalMsgTypeEnum;
+  show?: SwitchEnum;
+  show_date?: string;
+  priority?: number;
+  title?: string;
+  content?: string;
+  remark?: string;
+
+  user?: IUser;
 
   created_at?: string;
   updated_at?: string;
