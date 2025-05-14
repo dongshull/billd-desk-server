@@ -4,15 +4,16 @@ FROM node:18-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 安装 pnpm
-RUN npm install -g pnpm
+# 安装构建依赖和pnpm
+RUN apk add --no-cache python3 make g++ \
+    && npm install -g pnpm
 
 # 复制 package.json 和 pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
-# 安装生产依赖和开发依赖（因为构建步骤可能需要）
-# 如果构建不需要开发依赖，可以考虑只安装生产依赖 pnpm install --prod --frozen-lockfile
-RUN pnpm install --frozen-lockfile
+# 安装依赖并修复潜在权限问题
+RUN pnpm install --frozen-lockfile \
+    && pnpm rebuild
 
 # 复制项目其余文件
 COPY . .
@@ -31,8 +32,9 @@ COPY --from=builder /app/dist ./dist
 # 复制 package.json 和 pnpm-lock.yaml 以便安装生产依赖
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 
-# 安装 pnpm
-RUN npm install -g pnpm
+# 安装构建依赖和pnpm
+RUN apk add --no-cache python3 make g++ \
+    && npm install -g pnpm
 
 # 只安装生产依赖
 RUN pnpm install --prod --frozen-lockfile
