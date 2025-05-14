@@ -19,7 +19,7 @@ ENV NODE_OPTIONS=--max-old-space-size=4096
 # 将命令分开执行以便定位问题
 # 增加 --loglevel debug 获取更详细的 pnpm 日志
 # 尝试使用 --shamefully-hoist
-RUN HUSKY=0 pnpm install --frozen-lockfile --shamefully-hoist --loglevel debug
+RUN pnpm install --frozen-lockfile --shamefully-hoist --loglevel debug --ignore-scripts
 RUN pnpm rebuild
 # RUN pnpm cache clean # 暂时注释掉以减少变量
 
@@ -48,7 +48,7 @@ RUN apk update && apk add --no-cache curl openssl-dev libc-dev \
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
 # 只安装生产依赖
-RUN HUSKY=0 pnpm install --prod --frozen-lockfile --shamefully-hoist --loglevel debug
+RUN pnpm install --prod --frozen-lockfile --shamefully-hoist --loglevel debug --ignore-scripts
 # RUN pnpm rebuild # 如果生产依赖有原生模块且需要重新编译，则取消注释
 # RUN pnpm cache clean # 暂时注释掉
 
