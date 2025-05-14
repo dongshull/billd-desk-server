@@ -5,7 +5,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # 安装构建依赖和pnpm
-RUN apk add --no-cache python3 make g++ \
+RUN apk add --no-cache python3 make g++ curl openssl-dev \
     && npm install -g pnpm
 
 # 复制 package.json 和 pnpm-lock.yaml
@@ -13,7 +13,8 @@ COPY package.json pnpm-lock.yaml ./
 
 # 安装依赖并修复潜在权限问题
 RUN pnpm install --frozen-lockfile \
-    && pnpm rebuild
+    && pnpm rebuild \
+    && pnpm cache clean
 
 # 复制项目其余文件
 COPY . .
@@ -35,6 +36,8 @@ COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 # 安装构建依赖和pnpm
 RUN apk add --no-cache python3 make g++ \
     && npm install -g pnpm
+
+RUN apk update && apk upgrade
 
 # 只安装生产依赖
 RUN pnpm install --prod --frozen-lockfile
