@@ -4,6 +4,9 @@ FROM node:18-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
+# 设置环境变量，告知 prepare 脚本这是 Docker 构建环境
+ENV IS_DOCKER_BUILD=true
+
 # 安装构建依赖和pnpm
 # 添加 libc-dev，确保在最前面更新 apk 索引
 RUN apk update && apk add --no-cache python3 make g++ curl openssl-dev libc-dev \
@@ -33,6 +36,9 @@ RUN pnpm run build
 FROM node:18-alpine
 
 WORKDIR /app
+
+# 设置环境变量，告知 prepare 脚本这是 Docker 构建环境
+ENV IS_DOCKER_BUILD=true
 
 # 从构建器阶段复制构建产物 (dist 目录)
 COPY --from=builder /app/dist ./dist
