@@ -12,10 +12,14 @@ RUN apk update && apk add --no-cache python3 make g++ curl openssl-dev libc-dev 
 # 复制 package.json 和 pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
+# 设置 Node.js 内存限制
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
 # 安装依赖
 # 将命令分开执行以便定位问题
 # 增加 --loglevel debug 获取更详细的 pnpm 日志
-RUN pnpm install --frozen-lockfile --loglevel debug
+# 尝试使用 --shamefully-hoist
+RUN pnpm install --frozen-lockfile --shamefully-hoist --loglevel debug
 RUN pnpm rebuild
 # RUN pnpm cache clean # 暂时注释掉以减少变量
 
@@ -40,8 +44,11 @@ COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 RUN apk update && apk add --no-cache curl openssl-dev libc-dev \
     && npm install -g pnpm
 
+# 设置 Node.js 内存限制
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
 # 只安装生产依赖
-RUN pnpm install --prod --frozen-lockfile --loglevel debug
+RUN pnpm install --prod --frozen-lockfile --shamefully-hoist --loglevel debug
 # RUN pnpm rebuild # 如果生产依赖有原生模块且需要重新编译，则取消注释
 # RUN pnpm cache clean # 暂时注释掉
 
