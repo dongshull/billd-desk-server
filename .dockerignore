@@ -1,0 +1,78 @@
+# 忽略 node_modules 目录
+node_modules
+
+# 忽略 npm 调试日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db
+
+# 忽略 Git 相关文件
+.git
+.gitignore
+.gitattributes
+
+# 忽略 IDE 和编辑器配置文件
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# 忽略构建产物目录 (在 Dockerfile 的构建阶段会生成)
+dist
+
+# 忽略本地开发配置文件 (如果存在)
+.env
+.env.*
+!/.env.example
+
+# 忽略测试文件
+test/
+
+# 忽略文档 (除非需要在镜像中)
+docs/
+
+# 忽略部署相关文件 (通常不需要在镜像中)
+deploy/
+
+# 忽略 Husky 配置
+.husky/
+
+# 忽略 lint-staged 配置
+.lintstagedrc.js
+
+# 忽略 commitlint 配置
+.commitlintrc.js
+
+# 忽略 prettier 配置
+.prettierrc.js
+.prettierignore
+
+# 忽略 eslint 配置
+.eslintrc.js
+.eslintignore
+
+# 忽略 swc 配置
+.swcrc
+
+# 忽略 pnpm lockfile (Dockerfile 中会复制)
+# pnpm-lock.yaml
+
+# 忽略 package.json (Dockerfile 中会复制)
+# package.json
+
+# 忽略 tsconfig 文件 (构建时需要，但最终镜像不需要)
+# tsconfig.json
+# tsconfig.prod.json
+
+# 忽略上传目录 (如果不需要在镜像中)
+# upload/
+
+# 忽略公共静态资源目录 (如果不需要在镜像中)
+# public/

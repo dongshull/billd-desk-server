@@ -1,0 +1,74 @@
+name: Docker 镜像 CI
+
+# 定义工作流触发的事件
+on:
+  push:
+    branches: [ "main" ] # 当推送到 main 分支时触发
+    tags:
+      - 'v*.*.*' # 当推送 v*.*.* 格式的标签时触发 (例如 v1.0.0, v1.2.3)
+  pull_request:
+    branches: [ "main" ] # 当向 main 分支发起 Pull Request 时触发
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest # 指定运行环境为最新的 Ubuntu
+    permissions:
+      contents: read # 需要读取仓库内容的权限
+      packages: write # 需要写入 GitHub Packages (GHCR) 的权限
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3 # 使用官方的 checkout action 来获取仓库代码
+
+    - name: 设置 QEMU
+      uses: docker/setup-qemu-action@v2 # 设置 QEMU，用于多平台构建 (如果需要)
+
+    - name: 设置 Docker 构建工具
+      uses: docker/setup-build-action@v2 # 设置 Docker 构建工具，一个 Docker CLI 插件，用于扩展构建功能
+
+    - name: 登录到 GitHub Container Registry
+      # 仅在非 Pull Request 事件时执行登录操作 (例如 push 到 main 或 tag 时)
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v2 # 使用官方的 login action
+      with:
+        registry: ghcr.io # 指定 Docker 仓库地址为 GitHub Container Registry
+        username: ${{ github.repository_owner }} # 使用仓库所有者的 GitHub 用户名
+        password: ${{ secrets.GITHUB_TOKEN }} # 使用 GitHub Actions 自动提供的 GITHUB_TOKEN 作为密码
+
+    - name: 登录到 DockerHub
+      # 仅在非 Pull Request 事件时执行登录操作
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }} # 使用在GitHub Secrets中设置的DockerHub用户名
+        password: ${{ secrets.DOCKERHUB_TOKEN }} # 使用在GitHub Secrets中设置的DockerHub访问令牌
+
+    - name: 提取 Docker 元数据 (标签和标记)
+      id: meta # 给这个步骤设置一个 ID，方便后续引用其输出
+      uses: docker/metadata-action@v4 # 使用官方的 metadata action
+      with:
+        # 指定镜像名称，同时包含GitHub Container Registry和DockerHub
+        images: |
+          ghcr.io/${{ github.repository_owner }}/build-desk-server
+          ${{ secrets.DOCKERHUB_USERNAME }}/build-desk-server
+        # 定义如何生成镜像的标签
+        tags: |
+          type=schedule # 基于计划事件的标签 (如果设置了 schedule 触发器)
+          type=ref,event=branch # 基于分支名称的标签 (例如 main)
+          type=ref,event=pr # 基于 Pull Request 编号的标签 (例如 pr-123)
+          type=semver,pattern={{version}} # 基于语义化版本号的标签 (例如 v1.2.3)
+          type=semver,pattern={{major}}.{{minor}} # 基于主版本号和次版本号的标签 (例如 v1.2)
+          type=semver,pattern={{major}} # 基于主版本号的标签 (例如 v1)
+          type=sha # 基于 Git提交 SHA 的标签 (短哈希)
+
+    - name: 构建并推送 Docker 镜像
+      uses: docker/build-push-action@v4 # 使用官方的 build-push action
+      with:
+        context: . # Docker 构建上下文路径，. 表示当前仓库根目录
+        file: ./Dockerfile # 指定 Dockerfile 的路径
+        # 仅在非 Pull Request 事件时执行推送操作
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }} # 使用上一步提取的元数据作为镜像标签
+        labels: ${{ steps.meta.outputs.labels }} # 使用上一步提取的元数据作为镜像标记
+        cache-from: type=gha # 使用 GitHub Actions 的缓存来加速构建 (从缓存加载)
+        cache-to: type=gha,mode=max # 将构建缓存保存到 GitHub Actions (写入缓存，模式为 max)
